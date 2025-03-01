@@ -2,125 +2,135 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Prueba AR.js sin Marcador</title>
+  <title>Prueba AR.js con Modelo glTF</title>
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
-  <style>
-    #changeModelBtn {
-      position: absolute;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 10px 20px;
-      background: rgba(0, 0, 0, 0.7);
-      color: white;
-      border: none;
-      cursor: pointer;
-      font-size: 16px;
-      border-radius: 5px;
-    }
-  </style>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 </head>
 <body style="margin: 0; overflow: hidden;">
-  <button id="changeModelBtn">Cambiar Modelo</button>
-  
-  <a-scene embedded arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;">
-    <a-entity id="model" 
-      gltf-model="source/Lamp.glb" 
-      scale="1 1 1" 
-      position="0 0 -3" 
-      rotation="0 180 0"
-      gesture-handler>
-    </a-entity>
+  <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+    <!-- Definir el sistema de gestos -->
+    <script>
+      AFRAME.registerComponent('gesture-handler', {
+        schema: {
+          enabled: { default: true }
+        },
+        init: function () {
+          this.scaleFactor = 1;
+          this.model = this.el; // Referencia al modelo
+          this.startX = 0;
+          this.startY = 0;
+          this.isDragging = false;
+
+          // Eventos táctiles
+          this.el.sceneEl.canvas.addEventListener('touchstart', this.onTouchStart.bind(this));
+          this.el.sceneEl.canvas.addEventListener('touchmove', this.onTouchMove.bind(this));
+          this.el.sceneEl.canvas.addEventListener('touchend', this.onTouchEnd.bind(this));
+
+          // Eventos del mouse
+          this.el.sceneEl.canvas.addEventListener('mousedown', this.onMouseDown.bind(this));
+          this.el.sceneEl.canvas.addEventListener('mousemove', this.onMouseMove.bind(this));
+          this.el.sceneEl.canvas.addEventListener('mouseup', this.onMouseUp.bind(this));
+          this.el.sceneEl.canvas.addEventListener('wheel', this.onMouseWheel.bind(this));
+        },
+
+        onTouchStart: function (event) {
+          if (event.touches.length === 1) { // Rotación con un dedo
+            this.isDragging = true;
+            this.startX = event.touches[0].clientX;
+            this.startY = event.touches[0].clientY;
+          } else if (event.touches.length === 2) { // Zoom con dos dedos (pinch)
+            this.startDistance = this.getDistance(event.touches);
+          }
+        },
+
+        onTouchMove: function (event) {
+          if (this.isDragging && event.touches.length === 1) {
+            let deltaX = event.touches[0].clientX - this.startX;
+            let deltaY = event.touches[0].clientY - this.startY;
+            let rotation = this.model.getAttribute('rotation');
+
+            rotation.y -= deltaX * 0.5;
+            rotation.x -= deltaY * 0.5;
+
+            this.model.setAttribute('rotation', rotation);
+            this.startX = event.touches[0].clientX;
+            this.startY = event.touches[0].clientY;
+          } else if (event.touches.length === 2) { // Zoom táctil (pinch)
+            let newDistance = this.getDistance(event.touches);
+            let scale = this.model.getAttribute('scale');
+            let factor = newDistance / this.startDistance;
+
+            scale.x *= factor;
+            scale.y *= factor;
+            scale.z *= factor;
+
+            this.model.setAttribute('scale', scale);
+            this.startDistance = newDistance;
+          }
+        },
+
+        onTouchEnd: function () {
+          this.isDragging = false;
+        },
+
+        onMouseDown: function (event) {
+          this.isDragging = true;
+          this.startX = event.clientX;
+          this.startY = event.clientY;
+        },
+
+        onMouseMove: function (event) {
+          if (this.isDragging) {
+            let deltaX = event.clientX - this.startX;
+            let deltaY = event.clientY - this.startY;
+            let rotation = this.model.getAttribute('rotation');
+
+            rotation.y -= deltaX * 0.5;
+            rotation.x -= deltaY * 0.5;
+
+            this.model.setAttribute('rotation', rotation);
+            this.startX = event.clientX;
+            this.startY = event.clientY;
+          }
+        },
+
+        onMouseUp: function () {
+          this.isDragging = false;
+        },
+
+        onMouseWheel: function (event) {
+          let scale = this.model.getAttribute('scale');
+          let factor = event.deltaY > 0 ? 0.9 : 1.1; // Zoom in/out
+
+          scale.x *= factor;
+          scale.y *= factor;
+          scale.z *= factor;
+
+          this.model.setAttribute('scale', scale);
+        },
+
+        getDistance: function (touches) {
+          let dx = touches[0].clientX - touches[1].clientX;
+          let dy = touches[0].clientY - touches[1].clientY;
+          return Math.sqrt(dx * dx + dy * dy);
+        }
+      });
+    </script>
+
+    <!-- Marcador de Hiro -->
+    <a-marker preset="hiro">
+      <!-- Modelo con controles táctiles y de mouse -->
+      <a-entity
+        gltf-model="source/Lamp.glb"
+        scale="1 1 1"
+        position="0 0.5 0"
+        rotation="0 180 0"
+        gesture-handler>
+      </a-entity>
+    </a-marker>
+
+    <!-- Cámara -->
     <a-entity camera></a-entity>
   </a-scene>
-
-  <script>
-    AFRAME.registerComponent('gesture-handler', {
-      init: function () {
-        this.model = this.el;
-        this.isDragging = false;
-        this.startX = 0;
-        this.startY = 0;
-
-        this.el.sceneEl.canvas.addEventListener('mousedown', this.onMouseDown.bind(this));
-        this.el.sceneEl.canvas.addEventListener('mousemove', this.onMouseMove.bind(this));
-        this.el.sceneEl.canvas.addEventListener('mouseup', this.onMouseUp.bind(this));
-        this.el.sceneEl.canvas.addEventListener('wheel', this.onMouseWheel.bind(this));
-        this.el.sceneEl.canvas.addEventListener('touchstart', this.onTouchStart.bind(this));
-        this.el.sceneEl.canvas.addEventListener('touchmove', this.onTouchMove.bind(this));
-        this.el.sceneEl.canvas.addEventListener('touchend', this.onTouchEnd.bind(this));
-      },
-
-      onMouseDown: function (event) {
-        this.isDragging = true;
-        this.startX = event.clientX;
-        this.startY = event.clientY;
-      },
-
-      onMouseMove: function (event) {
-        if (!this.isDragging) return;
-        let deltaX = event.clientX - this.startX;
-        let deltaY = event.clientY - this.startY;
-        let rotation = this.model.getAttribute('rotation');
-        rotation.y -= deltaX * 0.5;
-        rotation.x -= deltaY * 0.5;
-        this.model.setAttribute('rotation', rotation);
-        this.startX = event.clientX;
-        this.startY = event.clientY;
-      },
-
-      onMouseUp: function () {
-        this.isDragging = false;
-      },
-
-      onMouseWheel: function (event) {
-        let scale = this.model.getAttribute('scale');
-        let factor = event.deltaY > 0 ? 0.9 : 1.1;
-        scale.x *= factor;
-        scale.y *= factor;
-        scale.z *= factor;
-        this.model.setAttribute('scale', scale);
-      },
-
-      onTouchStart: function (event) {
-        if (event.touches.length === 1) {
-          this.isDragging = true;
-          this.startX = event.touches[0].clientX;
-          this.startY = event.touches[0].clientY;
-        }
-      },
-
-      onTouchMove: function (event) {
-        if (!this.isDragging || event.touches.length !== 1) return;
-        let deltaX = event.touches[0].clientX - this.startX;
-        let deltaY = event.touches[0].clientY - this.startY;
-        let rotation = this.model.getAttribute('rotation');
-        rotation.y -= deltaX * 0.5;
-        rotation.x -= deltaY * 0.5;
-        this.model.setAttribute('rotation', rotation);
-        this.startX = event.touches[0].clientX;
-        this.startY = event.touches[0].clientY;
-      },
-
-      onTouchEnd: function () {
-        this.isDragging = false;
-      }
-    });
-
-    const models = [
-      "source/Lamp.glb", 
-      "source/model2.glb", 
-      "source/model3.glb"
-    ];
-    let currentModelIndex = 0;
-    const modelEntity = document.getElementById("model");
-    const changeModelBtn = document.getElementById("changeModelBtn");
-
-    changeModelBtn.addEventListener("click", () => {
-      currentModelIndex = (currentModelIndex + 1) % models.length;
-      modelEntity.setAttribute("gltf-model", models[currentModelIndex]);
-    });
-  </script>
 </body>
 </html>
