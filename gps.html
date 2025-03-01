@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Prueba AR.js con GPS</title>
+  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+</head>
+<body style="margin: 0; overflow: hidden;">
+  <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false; trackingMethod: gps;">
+    <!-- Modelo anclado en una ubicación GPS específica -->
+    <a-entity 
+      gltf-model="source/Lamp.glb"
+      gps-entity-place="latitude: 40.416775; longitude: -3.703790" 
+      scale="3 3 3">
+    </a-entity>
+
+    <!-- Cámara con GPS activado -->
+    <a-camera gps-camera rotation-reader></a-camera>
+  </a-scene>
+</body>
+</html>
