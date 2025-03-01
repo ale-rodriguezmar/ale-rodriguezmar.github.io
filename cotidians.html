@@ -29,12 +29,85 @@
       gltf-model="source/Lamp.glb" 
       scale="1 1 1" 
       position="0 0 -3" 
-      rotation="0 180 0">
+      rotation="0 180 0"
+      gesture-handler>
     </a-entity>
     <a-entity camera></a-entity>
   </a-scene>
 
   <script>
+    AFRAME.registerComponent('gesture-handler', {
+      init: function () {
+        this.model = this.el;
+        this.isDragging = false;
+        this.startX = 0;
+        this.startY = 0;
+
+        this.el.sceneEl.canvas.addEventListener('mousedown', this.onMouseDown.bind(this));
+        this.el.sceneEl.canvas.addEventListener('mousemove', this.onMouseMove.bind(this));
+        this.el.sceneEl.canvas.addEventListener('mouseup', this.onMouseUp.bind(this));
+        this.el.sceneEl.canvas.addEventListener('wheel', this.onMouseWheel.bind(this));
+        this.el.sceneEl.canvas.addEventListener('touchstart', this.onTouchStart.bind(this));
+        this.el.sceneEl.canvas.addEventListener('touchmove', this.onTouchMove.bind(this));
+        this.el.sceneEl.canvas.addEventListener('touchend', this.onTouchEnd.bind(this));
+      },
+
+      onMouseDown: function (event) {
+        this.isDragging = true;
+        this.startX = event.clientX;
+        this.startY = event.clientY;
+      },
+
+      onMouseMove: function (event) {
+        if (!this.isDragging) return;
+        let deltaX = event.clientX - this.startX;
+        let deltaY = event.clientY - this.startY;
+        let rotation = this.model.getAttribute('rotation');
+        rotation.y -= deltaX * 0.5;
+        rotation.x -= deltaY * 0.5;
+        this.model.setAttribute('rotation', rotation);
+        this.startX = event.clientX;
+        this.startY = event.clientY;
+      },
+
+      onMouseUp: function () {
+        this.isDragging = false;
+      },
+
+      onMouseWheel: function (event) {
+        let scale = this.model.getAttribute('scale');
+        let factor = event.deltaY > 0 ? 0.9 : 1.1;
+        scale.x *= factor;
+        scale.y *= factor;
+        scale.z *= factor;
+        this.model.setAttribute('scale', scale);
+      },
+
+      onTouchStart: function (event) {
+        if (event.touches.length === 1) {
+          this.isDragging = true;
+          this.startX = event.touches[0].clientX;
+          this.startY = event.touches[0].clientY;
+        }
+      },
+
+      onTouchMove: function (event) {
+        if (!this.isDragging || event.touches.length !== 1) return;
+        let deltaX = event.touches[0].clientX - this.startX;
+        let deltaY = event.touches[0].clientY - this.startY;
+        let rotation = this.model.getAttribute('rotation');
+        rotation.y -= deltaX * 0.5;
+        rotation.x -= deltaY * 0.5;
+        this.model.setAttribute('rotation', rotation);
+        this.startX = event.touches[0].clientX;
+        this.startY = event.touches[0].clientY;
+      },
+
+      onTouchEnd: function () {
+        this.isDragging = false;
+      }
+    });
+
     const models = [
       "source/Lamp.glb", 
       "source/model2.glb", 
