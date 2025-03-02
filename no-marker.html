@@ -18,7 +18,7 @@
           this.startX = 0;
           this.startY = 0;
           this.startDistance = 0;
-          this.minScale = 0.5;
+          this.minScale = -1000;
           this.maxScale = 5;
           this.minPosition = -3;
           this.maxPosition = 3;
@@ -113,10 +113,10 @@
     </script>
 
     <a-entity 
-      gltf-model="source/solar_sistem.glb"
+      gltf-model="source/table.glb"
       scale="1 1 1"
-      position="0 0 0"
-      rotation="0 0 0"
+      position="0 -2 -8"
+      rotation="10 0 0"
       gesture-handler 
       visible="true">
     </a-entity>
