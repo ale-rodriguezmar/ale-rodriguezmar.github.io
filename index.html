@@ -2,73 +2,277 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Implementaciones</title>
+  <title>Realidad Aumentada</title>
   <style>
+    /* Estilos generales */
     body {
-      font-family: Arial, sans-serif;
-      text-align: center;
+      font-family: 'Poppins', sans-serif;
       margin: 0;
-      padding: 20px;
-      background-color: #f4f4f4;
-    }
-    .container {
+      padding: 0;
+      background: linear-gradient(135deg, #f3e7e9 0%, #e3eeff 100%);
       display: flex;
-      flex-wrap: wrap;
       justify-content: center;
-      gap: 20px;
+      align-items: center;
+      min-height: 100vh;
+      flex-direction: column;
+      text-align: center;
     }
+
+    h1 {
+      font-size: 2rem;
+      color: #444;
+      margin-bottom: 20px;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Estilos del carrusel */
+    .carousel {
+      width: 90%;
+      max-width: 800px;
+      overflow: hidden;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      background-color: #fff;
+      position: relative;
+    }
+
+    .carousel-track {
+      display: flex;
+      transition: transform 0.5s ease-in-out;
+    }
+
+    .carousel-slide {
+      min-width: 100%; /* Cada slide ocupa el 100% del ancho del carrusel */
+      box-sizing: border-box;
+      padding: 15px;
+      background-color: #fff;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .carousel-slide:nth-child(odd) {
+      background-color: #faf3f3;
+    }
+
+    .carousel-slide h2 {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+
+    .carousel-slide p,
+    .carousel-slide ul {
+      font-size: 0.9rem;
+      margin: 5px 0;
+    }
+
+    .carousel-slide ul {
+      padding-left: 20px;
+    }
+
+    /* Estilos de los botones */
+    .carousel-button {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: rgba(255, 255, 255, 0.7);
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+      border-radius: 50%;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      font-size: 1.2rem;
+    }
+
+    .carousel-button:hover {
+      background-color: rgba(255, 255, 255, 1);
+    }
+
+    .carousel-button.prev {
+      left: 10px;
+    }
+
+    .carousel-button.next {
+      right: 10px;
+    }
+
+    /* Estilos de las tarjetas */
+    .card-container {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
     .card {
-      background: white;
-      padding: 20px;
-      width: 300px;
+      background-color: #fff;
       border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      padding: 15px;
+      width: 100%;
+      max-width: 250px;
+      text-align: center;
       transition: transform 0.3s;
     }
+
     .card:hover {
       transform: scale(1.05);
     }
-    .card img {
-      width: 100%;
-      border-radius: 10px;
+
+    .card h2 {
+      font-size: 1.1rem;
+      color: #007BFF;
     }
+
+    .card p {
+      font-size: 0.8rem;
+      color: #555;
+    }
+
     .card a {
-      display: block;
+      display: inline-block;
       margin-top: 10px;
-      padding: 10px;
-      background: #007BFF;
-      color: white;
+      padding: 10px 20px;
+      background-color: #007BFF;
+      color: #fff;
       text-decoration: none;
-      border-radius: 5px;
+      border-radius: 25px;
+      transition: background-color 0.3s, transform 0.3s;
+      font-size: 0.9rem;
+      font-weight: 500;
     }
+
     .card a:hover {
-      background: #0056b3;
+      background-color: #0056b3;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Ajustes responsivos */
+    @media (max-width: 768px) {
+      .carousel {
+        width: 95%;
+      }
+      h1 {
+        font-size: 1.8rem;
+      }
+      .carousel-button {
+        font-size: 1rem;
+        padding: 8px;
+      }
+      .carousel-slide {
+        padding: 10px;
+      }
+      .carousel-slide h2 {
+        font-size: 1.2rem;
+      }
+      .carousel-slide p,
+      .carousel-slide ul {
+        font-size: 0.8rem;
+      }
+      .card {
+        max-width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>Ejemplos de AR.js</h1>
-  <div class="container">
-    <div class="card">
-      <h2>AR con Marcador</h2>
-      <p>Ejemplo de AR usando un marcador Hiro.</p>
-      <a href="marker.html">Ver Ejemplo</a>
-    </div>
-    <div class="card">
-      <h2>AR sin Marcador</h2>
-      <p>Ejemplo de AR sin necesidad de marcador.</p>
-      <a href="no-marker.html">Ver Ejemplo</a>
-    </div>
-    <div class="card">
-        <h2>AR sin Marcador</h2>
-        <p>Ejemplo de AR sin necesidad de marcador.</p>
-        <a href="animation.html">Ver Ejemplo</a>
+
+  <h1>Implementacion de Realidad Aumentada</h1>
+
+  <div class="carousel">
+    <div class="carousel-track">
+      <div class="carousel-slide">
+        <h2>¿Qué es el proyecto?</h2>
+        <p>Este proyecto explora la implementación de realidad aumentada utilizando AR.js, permitiendo la integración de modelos 3D en entornos web sin necesidad de aplicaciones externas.</p>
       </div>
-    <!-- <div class="card">
-      <h2>AR con GPS</h2>
-      <p>Ejemplo de AR basado en la ubicación del usuario.</p>
-      <a href="gps.html">Ver Ejemplo</a>
-    </div> -->
+      <div class="carousel-slide">
+        <h2>Herramientas Utilizadas</h2>
+        <ul>
+          <li>JavaScript</li>
+          <li>Blender</li>
+          <li>HTML y CSS</li>
+          <li>AR.js</li>
+        </ul>
+      </div>
+      <div class="carousel-slide">
+        <h2>Problemas y Soluciones</h2>
+        <h3>Generación del modelo en Blender</h3>
+        <p>Se enfrentaron desafíos en la exportación de modelos 3D optimizados para la web, solucionados mediante la utilización del formato glTF.</p>
+        <h3>Autenticación HTTPS</h3>
+        <p>La implementación de HTTPS fue esencial para el funcionamiento de AR.js, lograda mediante la configuración adecuada del servidor.</p>
+        <h3>Ubicación del modelo</h3>
+        <p>Se ajustaron las coordenadas y escalas de los modelos para una correcta visualización en entornos de realidad aumentada.</p>
+      </div>
+      <div class="carousel-slide">
+        <h2>Ejemplos de AR.js</h2>
+        <div class="card-container">
+          <div class="card">
+            <h2>AR con Marcador</h2>
+            <p>Se requiere el uso de un marcador específico para visualizar el modelo en 3D.</p>
+            <a href="marker.html">Ver Ejemplo</a>
+          </div>
+          <div class="card">
+            <h2>Sin Marcador</h2>
+            <p>Permite la visualización de modelos 3D sin necesidad de un marcador físico.</p>
+            <a href="no-marker.html">Ver Ejemplo</a>
+          </div>
+          <div class="card">
+            <h2>Animación</h2>
+            <p>Integración de animaciones en modelos 3D dentro de entornos de realidad aumentada.</p>
+            <a href="animation.html">Ver Ejemplo</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="carousel-button prev" onclick="moveSlide(-1)">&#10094;</button>
+    <button class="carousel-button next" onclick="moveSlide(1)">&#10095;</button>
   </div>
+
+  <script>
+    const track = document.querySelector('.carousel-track');
+    const slides = Array.from(track.children);
+    const nextButton = document.querySelector('.carousel-button.next');
+    const prevButton = document.querySelector('.carousel-button.prev');
+    let currentSlide = 0;
+    
+    // Asegurar que el contenedor permita el desplazamiento
+    track.style.display = 'flex';
+    track.style.overflowX = 'hidden'; // Ocultar el scrollbar
+    track.style.scrollBehavior = 'smooth';
+    track.style.scrollSnapType = 'x mandatory';
+    slides.forEach(slide => slide.style.scrollSnapAlign = 'start');
+    
+    // Obtener el ancho real de un solo slide
+    function getSlideWidth() {
+      return slides[0].offsetWidth;
+    }
+    
+    // Función para cambiar de slide
+    function moveSlide(direction) {
+      currentSlide += direction/2;
+    
+      // Evitar que se salga de los límites
+      if (currentSlide < 0) {
+        currentSlide = slides.length - 1; // Ir al último slide
+      } else if (currentSlide >= slides.length) {
+        currentSlide = 0; // Volver al primero
+      }
+    
+      track.scrollTo({
+        left: currentSlide * getSlideWidth(),
+        behavior: 'smooth'
+      });
+    }
+    
+    // Eventos para los botones
+    nextButton.addEventListener('click', () => moveSlide(1));
+    prevButton.addEventListener('click', () => moveSlide(-1));
+    </script>
+    
+
+
 </body>
 </html>
